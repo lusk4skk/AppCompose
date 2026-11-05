@@ -1,0 +1,85 @@
+package br.edu.exemplo.calculadoradesconto
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import java.util.Locale
+
+@Composable
+fun CalculadoraDescontoScreen() {
+    var precoTexto by remember { mutableStateOf("") }
+    var percentualTexto by remember { mutableStateOf("") }
+    var resultado by remember { mutableStateOf("Informe o preço e o percentual, depois toque em calcular.") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "Calculadora de Desconto",
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo para o preço do produto
+        TextField(
+            value = precoTexto,
+            onValueChange = { novoTexto -> precoTexto = novoTexto },
+            label = { Text("Preço do produto") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo para o percentual de desconto
+        TextField(
+            value = percentualTexto,
+            onValueChange = { novoTexto -> percentualTexto = novoTexto },
+            label = { Text("Percentual de desconto") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                val preco = precoTexto
+                    .trim()
+                    .replace(',', '.')
+                    .toDoubleOrNull()
+
+                val percentual = percentualTexto
+                    .trim()
+                    .replace(',', '.')
+                    .toDoubleOrNull()
+
+                if (preco == null || preco < 0 || percentual == null || percentual < 0) {
+                    resultado = "Digite valores válidos."
+                } else {
+                    val precoFinal = calcularPrecoComDesconto(preco = preco, percentual = percentual)
+                    resultado = String.format(
+                        Locale("pt", "BR"),
+                        "Preço final: R$ %.2f",
+                        precoFinal
+                    )
+                }
+            }
+        ) {
+            Text("CALCULAR")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = resultado,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
